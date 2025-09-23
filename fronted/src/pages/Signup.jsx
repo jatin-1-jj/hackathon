@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
+import {  useNavigate } from 'react-router-dom'
+import {  useAuthStore } from '../store/authStore'
+
 
 
 export default function Signup() {
@@ -9,13 +10,14 @@ const [email, setEmail] = useState('')
 const [password, setPassword] = useState('')
 const [error, setError] = useState(null)
 const navigate = useNavigate()
-const { signup } = useAuth()
+const {register} = useAuthStore()
 
 
 const submit = async e => {
 e.preventDefault()
 try {
-await signup(name, email, password)
+    const data = {name,email,password}
+    register(data);
 navigate('/alumni')
 } catch (err) {
 setError(err.response?.data?.error || 'Signup failed')
