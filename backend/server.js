@@ -1,11 +1,10 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
-const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 //  const authRoutes = require('./routes/auth')
-const dotenv = require('dotenv');
+const http = require('http')
 
-const authRoutes = require('./routes/authRoutes')
+const {authRouter} = require('./routes/authRouter.js')
 //const authRoutes = require('./routes/authRoutes');
 const alumniRoutes = require('./routes/alumniRoutes.js');
 const adminRoutes = require('./routes/adminRoutes.js');
@@ -15,20 +14,28 @@ const mentorshipRoutes = require('./routes/mentorshipRoutes.js');
 const engagementRoutes = require('./routes/engagementRoutes.js');
 const messageRoutes = require("./routes/messages.js");
 const donationRoutes = require("./routes/donations.js");
-const app = express();
+const { connectDB } = require('./lib/mongoDB.js');
+
+
+const dotenv = require('dotenv');
 dotenv.config();
-app.use(cors());
-app.use(bodyParser.json());
+
+const originUrl = process.env.NODE_ENV==="development"?'http://localhost:5173':process.env.ORIGIN_URL
+const app = express();
+const server = http.createServer(app);
+
+app.use(cors({
+  origin:originUrl,
+  credentials:true,
+}));
+app.use(express.json());
+app.use(cookieParser());
 
 
-mongoose.connect(process.env.MONGO_URI ||`mongodb+srv://jatinjangra7417_db_user:AlumniDb@cluster0.qmtioij.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0` , {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => console.log('✅ MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
 
- 
-app.use('/api/auth', authRoutes);
+
+
+app.use('/api/auth', authRouter);
 app.use('/api/alumni', alumniRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/events', eventRoutes);
@@ -38,7 +45,11 @@ app.use('/api/engagement', engagementRoutes);
 app.use("/api/messages", messageRoutes);
 // app.use('/api/auth', authRoutes)
 app.use("/api/donations", donationRoutes);
+
 app.get('/', (req, res) => res.send('Alumni Backend Running'));
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+server.listen(PORT, () => {
+  connectDB()
+  console.log(`🚀 Server running on port ${PORT}`)
+});

@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../api";
-// 
-import { useAuth } from '../contexts/AuthContext'
 // import { useContext } from "react";
 // import { createContext } from "react";
 // const AuthContext = createContext()
@@ -30,12 +28,7 @@ export default function Messages() {
     if (!newMessage.trim()) return;
 
     try {
-      const res = await api.post("/messages", { text: newMessage }, {id: user.id},{
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, 
-        },
-    }
-      );
+      const res = await api.post("/messages", { text: newMessage});
       
       setMessages([...messages, res.data]);  
       setNewMessage("");
