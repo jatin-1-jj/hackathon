@@ -3,7 +3,6 @@ const User = require("../models/User");
 
 const protect = async (req, res, next) => {
   
-  console.log('33333333333333333333333333333333333')
   
   try {
     const token = req.cookies.jwtToken;

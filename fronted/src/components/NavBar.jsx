@@ -33,10 +33,10 @@ const NavBar = () => {
                     <Link to="/messages">Messages</Link>
                     <Link to="/Home">Home</Link>
                     <Link to="/home2">home2</Link>
-                    {authUser?.user?.role === 'admin' && <Link to="/admin">Admin</Link>}
+                    {authUser?.role === 'admin' && <Link to="/admin">Admin</Link>}
                 </div>
                 <div>
-                    {authUser?.user ? (
+                    {authUser ? (
                         <div className="flex items-center gap-3">
                             <span>{authUser?authUser.user?.name:""}</span>
                             <Link to="/profile" className="underline">Profile</Link>
