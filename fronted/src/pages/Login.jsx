@@ -19,7 +19,12 @@ export default function Login() {
         try {
             const data = {email,password};
             login(data);
-            navigate('/alumni')
+            navigate('/alumni');
+
+            // const res = await login(data);
+            // if(res.data.success){
+            //     navigate('/alumni')
+            // }
         } catch (err) {
             setError(err.response?.data?.error || 'Login failed')
         }

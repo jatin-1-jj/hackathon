@@ -1,24 +1,70 @@
-import React, { useEffect, useState } from 'react'
-import api from '../api'
+import { useEffect } from 'react'
+import { useAuthStore } from '../store/authStore'
+import { useAlumniStore } from '../store/alumniStore';
+import { useNavigate } from 'react-router-dom';
 
 
 export default function Alumni() {
-    const [alumni, setAlumni] = useState([])
-    useEffect(() => { api.get('/alumni/search').then(r => setAlumni(r.data)).catch(() => { }) }, [])
+    const { alumni,fetchAlumni,isFetchingAlumni } = useAlumniStore()
+    const { checkAuth, authUser, isCheckingAuth } = useAuthStore();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        checkAuth();
+        fetchAlumni();
+    }, [checkAuth,fetchAlumni])
+
+    if (!authUser || isCheckingAuth) {
+        return (
+            <>
+                {isCheckingAuth? (
+                    <>
+                        <div>
+                            Loading.....
+                        </div>
+                        <div>
+                            for better view add a Loader
+                        </div>
+                    </>
+                ) : (
+                    navigate("/login")
+                )}
+            </>
+        )
+    }
+
+    if(isFetchingAlumni){
+        return(
+            <>
+            <div>
+                fetching alumni......
+            </div>
+            </>
+        )
+    }
+
 
 
     return (
         <div>
             <h2 className="text-xl font-semibold mb-4">Alumni Directory</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {alumni.map(a => (
-                    <div key={a._id} className="p-3 bg-white rounded shadow">
-                        <div className="font-bold">{a.userId?.name}</div>
-                        <div className="text-sm">{a.profession} @ {a.company}</div>
-                        <div className="text-xs text-gray-600">{a.location}</div>
-                        <div className="mt-2">Skills: {a.skills?.join(', ')}</div>
-                    </div>
-                ))}
+            <div className="border border-black w-[95vw] h-screen grid grid-cols-1 md:grid-cols-2 gap-3">
+                {alumni.map((person) => 
+                    {
+                        return <div className='text-white bg-black w-fit h-fit'>
+                            <h3>name:{person.name}</h3>
+                            <h3>email:{person.email}</h3>
+                            <h3>role:{person.role}</h3>
+                            <h3>mentor:{person.mentor}</h3>
+                            <h3>mentee:{person.mentee}</h3>
+                            <div>skils:{person.skills.map((skil)=>(
+                                <div>
+                                    {skil}
+                                </div>
+                            ))}</div>
+                        </div>
+                    }
+                )}
             </div>
         </div>
     )

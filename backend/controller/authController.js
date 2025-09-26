@@ -7,7 +7,6 @@ const { generateToken } = require('../lib/utils');
 
 const check =(req,res)=>{
    try{
-      console.log('22222222222222222222222222')
       return res.status(200).json(req.user);
     }
     catch(error){
