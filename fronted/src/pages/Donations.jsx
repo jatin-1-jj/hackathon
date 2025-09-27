@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import api from '../api'
 
 
 export default function Donations() {
 const [donations, setDonations] = useState([])
-useEffect(() => { api.get('/donations').then(r => setDonations(r.data)).catch(() => {}) }, [])
+
 
 
 return (
