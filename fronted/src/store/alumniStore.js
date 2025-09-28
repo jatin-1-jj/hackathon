@@ -13,7 +13,7 @@ export const useAlumniStore =create((set)=>({
             const res = await axInstance.get('/alumni/get-alumni');
             if(res.data.success){
                 set({alumni:res.data.alumni});
-                toast.success(res.data.message,{position:"bottom-right"});
+                toast.success(res.data.message,{position:"bottom-right",duration:800});
             }
         } catch (error) {
             console.log('error in alumni store',error);

@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const Alumni = require("../models/Alumni");
 const Admin = require("../models/Admin");
 const Faculty = require("../models/Faculty");
+const Verify = require("../models/Verify");
 const { generateToken } = require("../lib/utils");
 
 const check = (req, res) => {
@@ -14,8 +15,6 @@ const check = (req, res) => {
       .json({ success: false, message: "internal server error in check" });
   }
 };
-
-
 const register = async (req, res) => {
   try {
     const { username, email, password, role } = req.body;
@@ -25,11 +24,11 @@ const register = async (req, res) => {
         message: "Name, email and password required",
       });
     }
-      const existing1 = await Admin.findOne({ email });
-      const existing2 = await Alumni.findOne({ email });
-      const existing3 = await Faculty.findOne({ email });
+    const existing1 = await Admin.findOne({ email });
+    const existing2 = await Alumni.findOne({ email });
+    const existing3 = await Faculty.findOne({ email });
 
-    if (existing1||existing2||existing3) {
+    if (existing1 || existing2 || existing3) {
       return res
         .status(200)
         .json({ success: false, message: "Email already registered" });
@@ -63,7 +62,7 @@ const register = async (req, res) => {
 
     await user.save();
 
-    const token = generateToken(user._id,role, res);
+    const token = generateToken(user._id, role, res);
 
     return res.status(201).json({
       token,
@@ -85,7 +84,6 @@ const register = async (req, res) => {
     });
   }
 };
-
 const login = async (req, res) => {
   try {
     const { email, password, role } = req.body;
@@ -124,7 +122,7 @@ const login = async (req, res) => {
       });
     }
 
-    const token = generateToken(user._id,role, res);
+    const token = generateToken(user._id, role, res);
     return res.status(200).json({
       token,
       success: true,
@@ -144,7 +142,6 @@ const login = async (req, res) => {
     });
   }
 };
-
 const logout = async (req, res) => {
   try {
     res.clearCookie("jwtToken", {
@@ -163,5 +160,66 @@ const logout = async (req, res) => {
     });
   }
 };
+const otp = async (req, res) => {
+  try {
+    const { verifyCode, email } = req.body;
 
-module.exports = { check, register, login, logout };
+    const existEmail = await Verify.findOne({ email });
+    if (existEmail) {
+      existEmail.code = verifyCode;
+      const now = new Date();
+      now.setHours(now.getHours() + 1);
+      existEmail.expiresAt = now;
+      return res.status(200).json({
+        success: true,
+        message: "code sent successfully",
+      });
+    }
+
+    const newEmail = new Verify({
+      email,
+      code: verifyCode,
+    });
+    await newEmail.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "code sent successfully",
+    });
+  } catch (error) {
+    console.log("error in authcontroller otp", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+const verifyOtp = async (req, res) => {
+  try {
+
+    const {email,otp} = req.body;
+
+    const user = await Verify.findOne({email})
+    console.log('sssssssssssssssssssssss ',otp,user)
+    if(otp===String(user.code)){
+      await Verify.deleteOne({email})
+      return res.status(200).json({
+        success:true,
+        message:'email verified successfully'
+      })
+    }
+    return res.status(200).json({
+        success:false,
+        message:'Incorrect otp'
+      })
+
+  } catch (error) {
+    console.log("error in authcontroller verifyOtp", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+module.exports = { check, register, login, logout, otp, verifyOtp };

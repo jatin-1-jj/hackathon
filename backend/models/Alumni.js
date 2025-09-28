@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { email } = require("zod");
 
 
 
@@ -7,6 +8,7 @@ const alumniSchema = new mongoose.Schema({
   name:{type:String,default: function () {
       return this.username;
     },},
+  email: { type: String, unique: true, required: true },
   password: { type: String, required: true },
   role: {
     type: String,
