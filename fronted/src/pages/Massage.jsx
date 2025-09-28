@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { api } from "../api";
+
 // import { useContext } from "react";
 // import { createContext } from "react";
 // const AuthContext = createContext()
@@ -10,18 +10,7 @@ export default function Messages() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
-  useEffect(() => {
-    
-    const fetchMessages = async () => {
-      try {
-        const res = await api.get("/messages");
-        setMessages(res.data);
-      } catch (err) {
-        console.error("Error fetching messages:", err);
-      }
-    };
-    fetchMessages();
-  }, []);
+
 
   const sendMessage = async (e) => {
     e.preventDefault();

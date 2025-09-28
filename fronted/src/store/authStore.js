@@ -1,62 +1,114 @@
-import {create} from 'zustand'
-import { axInstance } from '../lib/axios';
+import { create } from "zustand";
+import { axInstance } from "../lib/axios";
+import toast from "react-hot-toast";
 
+export const useAuthStore = create((set) => ({
+  authUser: null,
+  isSigningUp: false,
+  isSigningIn: false,
+  isUpdatingProfile: false,
+  isCheckingAuth: true,
+  isLoggingOut: false,
+  isCheckingUnique:false,
+  checkAuth: async () => {
+    try {
+      const res = await axInstance.get("/auth/check");
+      console.log("resssssssssssssssssssssssssssCHECK", res);
+      if (res.data.success) {
+        set({ authUser: res.data.user });
+      }
+    } catch (error) {
+      console.log(`error in checkAuth useAuthStore : `, error);
+      set({ authUser: null });
+    } finally {
+      set({ isCheckingAuth: false });
+    }
+  },
 
+  register: async (data) => {
+    set({ isSigningUp: true });
+    try {
+      const res = await axInstance.post("/auth/register", data);
+      if (res.data.success) {
+        set({ authUser: res.data });
+        toast.success("Account created successfully");
+      } else {
+        toast.error(res.data.message);
+      }
+      return res;
+    } catch (err) {
+      console.log("error in registering authstore", err);
+      toast.error("error in catch signup");
+    } finally {
+      set({ isSigningUp: false });
+    }
+  },
 
-export const useAuthStore = create((set)=>({
+  login: async (data) => {
+    set({ isSigningIn: true });
+    try {
+      const res = await axInstance.post("/auth/login", data);
+      console.log("LOGIN", res);
+      set({ authUser: res.data });
+      if (res.data.success) {
+        toast.success("logged In In successfully");
+      } else {
+        toast.error(res.data.message);
+      }
+      // get().connectSocket();
+      return res;
+    } catch (error) {
+      console.log("error in login", error);
+      toast.error(error.message);
+    } finally {
+      set({ isSigningIn: false });
+    }
+  },
 
+  logout: async () => {
+    set({ isLoggingOut: true });
+    try {
+      const res = await axInstance.get("/auth/log-out");
+      console.log("looooooggggggggggggggg", res.data.success);
+      if (res.data.success) {
+        toast.success(res.data.message);
+        set({ authUser: null });
+      } else {
+        toast.error(res.data.message);
+      }
+      return res;
+    } catch (error) {
+      console.log("error in authstore logging", error);
+      toast.error("error in catch logging out");
+    } finally {
+      set({ isLoggingOut: false });
+    }
+  },
 
-    authUser:null,
-    isSigningUp:false,
-    isSigningIn:false,
-    isUpdatingProfile:false,
-    isCheckingAuth:true,
+  isValidUsername:(username) =>{
+    const usernameRegex = /^[a-zA-Z0-9_]+$/;
+    return usernameRegex.test(username);
+  },
+  isValidEmail:(email) =>{
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  },
 
-    checkAuth:async ()=>{
-            try {
-                const res = await axInstance.get("/auth/check");
-                set({authUser:res.data});
-            } catch (error) {
-                console.log(`error in checkAuth useAuthStore : `,error);
-                set({authUser:null})
-                
-            }finally{
-                set({isCheckingAuth:false});
-            }
-        },
-
-    register:async (data)=>{
-        set({isSigningUp:true});
-        try {
-            const res = await axInstance.post("/auth/register",data);
-            set({authUser:res.data});
-            // toast.success("Account created successfully");
-
-        } catch (err) {
-            console.log('error in registering',err)
-            // toast.error(err.response.data.message);
-        }finally{
-            set({isSigningUp:false});
-        }
-    },
-
-    login:async (data)=>{
-        set({isSigningIn:true})
-        try {
-            const res = await axInstance.post("/auth/login",data);
-            set({authUser:res.data});
-            // toast.success("signed In successfully");
-            // get().connectSocket();
-            return Response.json({
-                    success:true
-                })
-        } catch (error) {
-            console.log('error in login',error)
-            // toast.error(error.response.data.message);
-        }finally{
-            set({isSigningIn:false})
-        }
-    },
-
-
-}))
+  checkUniqueUsername:async (username)=>{
+    set({isCheckingUnique:true})
+    try {
+      const res = await axInstance.post('/auth/check-unique-username',username);
+      if(res.data.success){
+        toast.success(res.data.message,{position:"bottom-right"})
+      }else{
+        toast.error(res.data.message,{position:"bottom-right"})
+      }
+      return res;
+    } catch (error) {
+      console.log('error in checkUniqueUsername authstore',error);
+      toast.error('error while checking username');
+    }finally{
+      set({isCheckingUnique:false})
+    }
+  }
+}));

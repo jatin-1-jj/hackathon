@@ -4,10 +4,10 @@ const cookieParser = require('cookie-parser');
 //  const authRoutes = require('./routes/auth')
 const http = require('http')
 
-const {authRouter} = require('./routes/authRouter.js')
-//const authRoutes = require('./routes/authRoutes');
-const alumniRoutes = require('./routes/alumniRoutes.js');
-const adminRoutes = require('./routes/adminRoutes.js');
+const authRouter = require('./routes/authRouter.js')
+const alumniRouter = require('./routes/alumniRouter.js');
+
+const adminRoutes = require('./routes/adminRouter.js');
 const eventRoutes = require('./routes/eventRoutes.js');
 const paymentRoutes = require('./routes/paymentRoutes.js');
 const mentorshipRoutes = require('./routes/mentorshipRoutes.js');
@@ -36,14 +36,13 @@ app.use(cookieParser());
 
 
 app.use('/api/auth', authRouter);
-app.use('/api/alumni', alumniRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/events', eventRoutes);
-app.use('/api/payments', paymentRoutes);
-app.use('/api/mentorship', mentorshipRoutes);
-app.use('/api/engagement', engagementRoutes);
-app.use("/api/messages", messageRoutes);
-// app.use('/api/auth', authRoutes)
+app.use('/api/alumni', alumniRouter);
+// app.use('/api/admin', adminRoutes);
+// app.use('/api/events', eventRoutes);
+// app.use('/api/payments', paymentRoutes);
+// app.use('/api/mentorship', mentorshipRoutes);
+// app.use('/api/engagement', engagementRoutes);
+// app.use("/api/messages", messageRoutes);
 app.use("/api/donations", donationRoutes);
 
 app.get('/', (req, res) => res.send('Alumni Backend Running'));

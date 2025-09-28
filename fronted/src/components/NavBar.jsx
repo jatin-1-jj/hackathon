@@ -1,26 +1,18 @@
-import React, { useEffect } from 'react'
-import {  useAuthStore } from '../store/authStore';
+import  { useEffect } from 'react'
+import { useAuthStore } from '../store/authStore';
 import { Link } from 'react-router-dom';
-
-
 
 const NavBar = () => {
 
-    const { authUser, checkAuth,logout } = useAuthStore();
+    const { authUser, checkAuth } = useAuthStore();
 
     useEffect(() => {
         checkAuth();
     }, [checkAuth])
 
-  console.log(`authUser is : `,authUser)
+    console.log(`authUser is : `, authUser)
 
-//   if((isCheckingAuth&&!authUser)){
-//     return(
-//       <div className="ml-[49vw] scale-150">
-//         <Loader/>
-//       </div>
-//     )
-//   }    
+
 
     return (
         <>
@@ -38,9 +30,8 @@ const NavBar = () => {
                 <div>
                     {authUser ? (
                         <div className="flex items-center gap-3">
-                            <span>{authUser?authUser.user?.name:""}</span>
+                            <span>{authUser ? authUser.user?.name : ""}</span>
                             <Link to="/profile" className="underline">Profile</Link>
-                            <button onClick={logout} className="ml-2 bg-red-500 px-3 py-1 rounded">Logout</button>
                         </div>
                     ) : (
                         <div className="flex gap-3">

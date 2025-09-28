@@ -29,7 +29,7 @@ const fetchAlumni = async(req,res)=>{
         return res.status(201).json({
             success:true,
             alumni:allAlumni,
-            message:"here is your Alumni list"
+            message:"Here is your Alumni list"
         }
         );
     } catch (error) {

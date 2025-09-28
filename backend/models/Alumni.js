@@ -3,10 +3,15 @@ const mongoose = require("mongoose");
 
 
 const alumniSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+  username: { type: String, require: true },
+  name:{type:String,default: function () {
+      return this.username;
+    },},
+  password: { type: String, required: true },
+  role: {
+    type: String,
+    enum: [, "alumni", "admin"],
+    default: "alumni",
   },
   batch: { 
     type: Number,
@@ -35,14 +40,12 @@ const alumniSchema = new mongoose.Schema({
     type: Boolean, 
     default: false 
 },
-  mentee: { 
-    type: Boolean, 
-    default: false 
-},
   createdAt: { 
     type: Date, 
     default: Date.now 
 },
+verified: { type: Boolean, default: false },
+expiresAt:{type:Date,default:()=>new Date(Date.now()+14*24*60*60*1000)}
 });
 
 module.exports = mongoose.model("Alumni", alumniSchema);
