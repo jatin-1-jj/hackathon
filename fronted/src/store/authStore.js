@@ -9,11 +9,10 @@ export const useAuthStore = create((set) => ({
   isUpdatingProfile: false,
   isCheckingAuth: true,
   isLoggingOut: false,
-  isCheckingUnique:false,
+  isCheckingUnique: false,
   checkAuth: async () => {
     try {
       const res = await axInstance.get("/auth/check");
-      console.log("resssssssssssssssssssssssssssCHECK", res);
       if (res.data.success) {
         set({ authUser: res.data.user });
       }
@@ -48,7 +47,6 @@ export const useAuthStore = create((set) => ({
     set({ isSigningIn: true });
     try {
       const res = await axInstance.post("/auth/login", data);
-      console.log("LOGIN", res);
       set({ authUser: res.data });
       if (res.data.success) {
         toast.success("logged In In successfully");
@@ -69,7 +67,6 @@ export const useAuthStore = create((set) => ({
     set({ isLoggingOut: true });
     try {
       const res = await axInstance.get("/auth/log-out");
-      console.log("looooooggggggggggggggg", res.data.success);
       if (res.data.success) {
         toast.success(res.data.message);
         set({ authUser: null });
@@ -85,30 +82,59 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  isValidUsername:(username) =>{
+  isValidUsername: (username) => {
     const usernameRegex = /^[a-zA-Z0-9_]+$/;
     return usernameRegex.test(username);
   },
-  isValidEmail:(email) =>{
+
+  isValidEmail: (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   },
+  isValidOtp: (otp) => {
+    const otpRegex = /^\d{6}$/;
+    return otpRegex.test(otp);
+  },
 
-  checkUniqueUsername:async (username)=>{
-    set({isCheckingUnique:true})
+  checkOtp: async (data) => {
     try {
-      const res = await axInstance.post('/auth/check-unique-username',username);
+      const res = await axInstance.post("/auth/check-otp",data);
+
       if(res.data.success){
-        toast.success(res.data.message,{position:"bottom-right"})
+        toast.success('email verified');
       }else{
-        toast.error(res.data.message,{position:"bottom-right"})
+        toast.error('email not verified')
       }
       return res;
     } catch (error) {
-      console.log('error in checkUniqueUsername authstore',error);
-      toast.error('error while checking username');
-    }finally{
-      set({isCheckingUnique:false})
+      console.error("Error sending email:", error);
+      return { success: false, message: "Error verifing otp" };
     }
-  }
+  },
+  checkUniqueUsername: async (username) => {
+    set({ isCheckingUnique: true });
+    try {
+      const res = await axInstance.post(
+        "/auth/check-unique-username",
+        username
+      );
+      if (res.data.success) {
+        toast.success(res.data.message, {
+          position: "bottom-right",
+          duration: 800,
+        });
+      } else {
+        toast.error(res.data.message, {
+          position: "bottom-right",
+          duration: 800,
+        });
+      }
+      return res;
+    } catch (error) {
+      console.log("error in checkUniqueUsername authstore", error);
+      toast.error("error while checking username");
+    } finally {
+      set({ isCheckingUnique: false });
+    }
+  },
 }));
